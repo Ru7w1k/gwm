@@ -9,24 +9,26 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include <gl/GL.h>
-#include "../vmath.h"
+#include "vmath.h"
 
 using namespace vmath;
 
-typedef void (*InitializeCallback) (void);
-typedef void (*KeyboardCallback)   (unsigned int key);
-typedef void (*MouseMoveCallback)  (int x, int y);
-typedef void (*MouseClickCallback) (unsigned int key, int x, int y);
-typedef void (*KeyboardCallback)   (unsigned int key);
-typedef void (*DisplayCallback)    (void);
-typedef void (*UpdateCallback)     (void);
-typedef void (*ReshapeCallback)    (int width, int height);
+typedef void (*InitializeCallback)      (void);
+typedef void (*UninitializeCallback)    (void);
+typedef void (*KeyboardCallback)        (unsigned int key);
+typedef void (*MouseMoveCallback)       (int x, int y);
+typedef void (*MouseClickCallback)      (unsigned int key, int x, int y);
+typedef void (*KeyboardCallback)        (unsigned int key);
+typedef void (*DisplayCallback)         (void);
+typedef void (*UpdateCallback)          (void);
+typedef void (*ReshapeCallback)         (int width, int height);
 
 
 void gwmCreateWindow(const char *title, int x, int y, int width, int height);
 void gwmDestroyWindow(void);
 
 void gwmInitializeCallback(InitializeCallback callback);
+void gwmUninitiiizeCallback(UninitializeCallback callback); 
 
 void gwmFullScreen();
 void gwmExitFullScreen();
@@ -41,6 +43,7 @@ void gwmMouseClickCallback(MouseClickCallback callback);
 void gwmDisplayCallback(DisplayCallback callback);
 void gwmUpdateCallback(UpdateCallback callback);
 void gwmReshapeCallback(ReshapeCallback callback);
+void gwmSwapBuffers(void);
 
 void gwmLog(const char *log);
 
