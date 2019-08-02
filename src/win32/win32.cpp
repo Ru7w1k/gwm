@@ -20,17 +20,21 @@ HGLRC ghRC = NULL;
 HWND  ghWnd = NULL;
 DWORD dwStyle;
 
+int gWidth = 800;
+int gHeight = 600;
+
 WINDOWPLACEMENT wpPrev = { sizeof(WINDOWPLACEMENT) };
 
 // Callbacks
-InitializeCallback  initializeCallback  = NULL;
-KeyboardCallback    keyboardCallback    = NULL;  
-MouseMoveCallback   mouseMoveCallback   = NULL; 
-MouseClickCallback  mouseClickCallback  = NULL;
-DisplayCallback     displayCallback     = NULL;   
-UpdateCallback      updateCallback      = NULL;    
-ReshapeCallback     reshapeCallback     = NULL;   
-
+InitializeCallback   initializeCallback  = NULL;
+KeyboardCallback     keyboardCallback    = NULL;  
+MouseMoveCallback    mouseMoveCallback   = NULL; 
+MouseClickCallback   mouseClickCallback  = NULL;
+DisplayCallback      displayCallback     = NULL;   
+UpdateCallback       updateCallback      = NULL;    
+ReshapeCallback      reshapeCallback     = NULL;   
+UninitializeCallback uninitializeCallback = NULL;
+ 
 // Global function declaration
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void    ToggleFullScreen(void);
@@ -38,9 +42,6 @@ void    ToggleFullScreen(void);
 LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
 	// function declarations
-	void resize(int, int);
-	void uninitialize();
-
 	void ToggleFullScreen(void);
 
 	// code
@@ -56,7 +57,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SIZE:
-		resize(LOWORD(lParam), HIWORD(lParam));
+        if (reshapeCallback)
+		    reshapeCallback(LOWORD(lParam), HIWORD(lParam));
 		break;
 
 	case WM_CLOSE:
@@ -64,6 +66,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_KEYDOWN:
+        if(keyboardCallback) 
+            keyboardCallback(wParam);
+
 		switch (wParam)
 		{
 		case VK_ESCAPE:
@@ -83,7 +88,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_DESTROY:
-		uninitialize();
+        uninitialize();
 		PostQuitMessage(0);
 		break;
 	}
@@ -193,13 +198,14 @@ int initialize(void)
 		DestroyWindow(ghWnd);
 	}
 
-    initializeCallback();
+    if(initializeCallback)
+        initializeCallback();
 
 	// clear the depth buffer
 	glClearDepth(1.0f);
 
 	// clear the screen by OpenGL
-	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// enable depth
 	glEnable(GL_DEPTH_TEST);
@@ -208,7 +214,56 @@ int initialize(void)
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
+    if(reshapeCallback)
+        reshapeCallback(gWidth, gHeight);
+
 	return(0);
+}
+
+void uninitialize(void)
+{
+    if (uninitializeCallback)
+        uninitializeCallback();
+
+    	// fullscreen check
+	if (gbIsFullScreen == true)
+	{
+		SetWindowLong(ghWnd, GWL_STYLE, dwStyle | WS_OVERLAPPEDWINDOW);
+		SetWindowPlacement(ghWnd, &wpPrev);
+		SetWindowPos(ghWnd,
+			HWND_TOP,
+			0,
+			0,
+			0,
+			0,
+			SWP_NOZORDER | SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOOWNERZORDER);
+
+		ShowCursor(TRUE);
+	}
+
+	// break the current context
+	if (wglGetCurrentContext() == ghRC)
+	{
+		wglMakeCurrent(NULL, NULL);
+	}
+
+	if (ghRC)
+	{
+		wglDeleteContext(ghRC);
+	}
+
+	if (ghDC)
+	{
+		ReleaseDC(ghWnd, ghDC);
+		ghDC = NULL;
+	}
+
+	if (gpFile)
+	{
+		fprintf(gpFile, "Log file is closed...\n");
+		fclose(gpFile);
+		gpFile = NULL;	
+    }
 }
 
 void gwmCreateWindow(const char *title, int x, int y, int width, int height)
@@ -218,6 +273,9 @@ void gwmCreateWindow(const char *title, int x, int y, int width, int height)
 	WNDCLASSEX wndclass;
 	HWND hwnd;
 	MSG msg;
+
+    gWidth = width;
+    gHeight = height;
 
     HINSTANCE hInstance = (HINSTANCE) GetModuleHandle(NULL);
 
@@ -257,7 +315,7 @@ void gwmCreateWindow(const char *title, int x, int y, int width, int height)
 	// create window
 	hwnd = CreateWindowEx(WS_EX_APPWINDOW,
 		szClassName,
-		TEXT("PP | Blue Screen with Shaders"),
+		szClassName,
 		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_VISIBLE,
 		x,
 		y,
@@ -345,10 +403,15 @@ void gwmEventLoop()
 		{
 			if (gbActiveWindow == true) 
             {
-                updateCallback();
+                if (updateCallback)
+                    updateCallback();
             }
 
-			displayCallback();
+            if (displayCallback)
+			{
+			    displayCallback();
+				fprintf(gpFile, "display called...\n");
+			}
 		}
     }    
 }
@@ -356,6 +419,7 @@ void gwmEventLoop()
 void gwmExitEventLoop()
 {
     // TODO: post WM_QUIT message
+    DestroyWindow(ghWnd);
 }
 
 
@@ -394,4 +458,7 @@ void gwmReshapeCallback(ReshapeCallback callback)
     reshapeCallback = callback;
 }
 
-
+void gwmSwapBuffers(void)
+{
+    SwapBuffers(ghDC);
+}
