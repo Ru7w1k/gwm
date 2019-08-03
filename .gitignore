@@ -1,2 +1,10 @@
 .vscode/
-src/win32/*.obj
+
+**.obj
+**.txt
+**.exe
+**.lib
+**.pdb
+
+example/win32/triangle/gwm.h
+example/win32/triangle/vmath.h
