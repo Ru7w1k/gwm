@@ -10,5 +10,6 @@ This will create an opengl rendering context window, with following properties:
 - vmath is included
 
 Supported Platforms:
+====================
 - Windows
 - Linux
