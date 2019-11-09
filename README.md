@@ -8,3 +8,7 @@ This will create an opengl rendering context window, with following properties:
 - depth is enabled
 - glew extensions are initialized
 - vmath is included
+
+Supported Platforms:
+- Windows
+- Linux
