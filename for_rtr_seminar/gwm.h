@@ -13,14 +13,9 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <string>
-#include <GL/glew.h>
 #include <gl/GL.h>
-#include "vmath.h"
-
-using namespace vmath;
 
 // Linker Options
-#pragma comment(lib, "glew32.lib")
 #pragma comment(lib, "opengl32.lib")
 
 typedef void (*InitializeCallback)      (void);
@@ -236,15 +231,6 @@ int initialize(void)
 	if (wglMakeCurrent(_ghDC, _ghRC) == FALSE)
 	{
 		return(-4);
-	}
-
-	//// Programable Pipeline ////////////////////////////////////////////
-
-	result = glewInit();
-	if (result != GLEW_OK) {
-		fprintf(_gpFile, "GLEW initialization failed..\n");
-		_uninitialize();
-		DestroyWindow(_ghWnd);
 	}
 
     if(_initializeCallback)
