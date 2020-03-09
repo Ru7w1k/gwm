@@ -1,9 +1,8 @@
 .vscode/
 
-**.obj
+
 **.txt
 **.exe
-**.lib
 **.pdb
 
 example/win32/triangle/gwm.h
