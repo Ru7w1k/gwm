@@ -35,7 +35,7 @@ void gwmCreateWindow(const char *title, int x, int y, int width, int height);
 void gwmDestroyWindow(void);
 
 void gwmInitializeCallback(InitializeCallback callback);
-void gwmUninitiiizeCallback(UninitializeCallback callback); 
+void gwmUninitializeCallback(UninitializeCallback callback); 
 
 void gwmFullScreen();
 void gwmExitFullScreen();
@@ -467,6 +467,10 @@ void gwmInitializeCallback(InitializeCallback callback)
     _initializeCallback = callback;
 }
 
+void gwmUninitializeCallback(UninitializeCallback callback)
+{
+    _uninitializeCallback = callback;
+}
 
 void gwmKeyboardCallback(KeyboardCallback callback)
 {
