@@ -16,6 +16,9 @@ if %ERRORLEVEL% NEQ 0 (
     GOTO completed
 )
 
+echo Deleting Triangle.obj...
+del triangle.obj 
+
 echo Running Triangle.exe...
 triangle.exe
 
