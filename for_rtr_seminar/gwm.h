@@ -186,7 +186,6 @@ void ToggleFullScreen()
 int initialize(void)
 {
 	// function declarations
-	void resize(int, int);
 	void _uninitialize(void);
 
 	// variable declarations
@@ -249,8 +248,10 @@ int initialize(void)
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-    if(_reshapeCallback)
+    if(_reshapeCallback) {
         _reshapeCallback(_gWidth, _gHeight);
+		fprintf(_gpFile, "ReshapeCallback...\n");
+	}
 
 	return(0);
 }
@@ -445,7 +446,6 @@ void gwmEventLoop()
             if (_displayCallback)
 			{
 			    _displayCallback();
-				fprintf(_gpFile, "display called...\n");
 			}
 		}
     }    

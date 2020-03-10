@@ -8,18 +8,16 @@ void main (void)
     void reshapeFunc(int, int);
 
     // code
-    gwmCreateWindow("gwm demo", 100, 100, 300, 300);
-
     gwmKeyboardCallback(keyboardFunc);
     gwmDisplayCallback(displayFunc);
     gwmReshapeCallback(reshapeFunc);
 
+    gwmCreateWindow("OpenGL | FFP | GWM", 100, 100, 800, 600);
     gwmEventLoop();
 }
 
 void keyboardFunc(unsigned int key)
 {
-    // TODO: common keymaps for all platforms
     // VK_ESCAPE
     if(key == 0x1B)
     {
@@ -33,7 +31,7 @@ void reshapeFunc(int width, int height)
     glLoadIdentity();
 
     glViewport(0, 0, width, height);
-    glOrtho(-1, 1, -1, 1, -1, 1);
+    glOrtho(-2, 2, -2, 2, -1, 1);
 }
 
 void displayFunc(void)
