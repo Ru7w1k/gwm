@@ -14,9 +14,11 @@
 #include <stdio.h>
 #include <string>
 #include <gl/GL.h>
+#include <gl/GLU.h>
 
 // Linker Options
 #pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glu32.lib")
 
 typedef void (*InitializeCallback)      (void);
 typedef void (*UninitializeCallback)    (void);
@@ -51,6 +53,9 @@ void gwmReshapeCallback(ReshapeCallback callback);
 void gwmSwapBuffers(void);
 
 void gwmLog(const char *log);
+
+bool gwmLoadTexture(GLuint *texture, TCHAR imageResourceID[]);
+
 
 // Global Variables
 FILE  *_gpFile = NULL;
@@ -496,6 +501,41 @@ void gwmReshapeCallback(ReshapeCallback callback)
 void gwmSwapBuffers(void)
 {
     SwapBuffers(_ghDC);
+}
+
+bool gwmLoadTexture(GLuint *texture, TCHAR imageResourceID[])
+{
+	// variables
+	HBITMAP hBitmap = NULL;
+	BITMAP bmp;
+	bool bStatus = false;
+
+	// data
+	hBitmap = (HBITMAP)LoadImage(GetModuleHandle(NULL),
+		imageResourceID,
+		IMAGE_BITMAP,
+		0, 0,
+		LR_CREATEDIBSECTION
+	);
+
+	if (hBitmap)
+	{
+		bStatus = true;
+		GetObject(hBitmap, sizeof(BITMAP), &bmp);
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glGenTextures(1, texture);
+		glBindTexture(GL_TEXTURE_2D, *texture);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		gluBuild2DMipmaps(GL_TEXTURE_2D, 3, bmp.bmWidth, bmp.bmHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, bmp.bmBits);
+
+		DeleteObject(hBitmap);
+	}
+
+	return bStatus;
 }
 
 #endif
