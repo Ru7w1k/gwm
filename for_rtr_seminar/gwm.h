@@ -255,7 +255,6 @@ int initialize(void)
 
     if(_reshapeCallback) {
         _reshapeCallback(_gWidth, _gHeight);
-		fprintf(_gpFile, "ReshapeCallback...\n");
 	}
 
 	return(0);
