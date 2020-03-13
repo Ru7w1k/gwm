@@ -52,7 +52,8 @@ void gwmUpdateCallback(UpdateCallback callback);
 void gwmReshapeCallback(ReshapeCallback callback);
 void gwmSwapBuffers(void);
 
-void gwmLog(const char *log);
+// void gwmLog(const char *log);
+#define gwmLog(...)   fprintf(_gpFile, __VA_ARGS__);fprintf(_gpFile, "\n")
 
 bool gwmLoadTexture(GLuint *texture, TCHAR imageResourceID[]);
 
@@ -237,9 +238,6 @@ int initialize(void)
 		return(-4);
 	}
 
-    if(_initializeCallback)
-        _initializeCallback();
-
 	// clear the depth buffer
 	glClearDepth(1.0f);
 
@@ -252,6 +250,9 @@ int initialize(void)
 
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+    if(_initializeCallback)
+        _initializeCallback();
 
     if(_reshapeCallback) {
         _reshapeCallback(_gWidth, _gHeight);

@@ -1,0 +1,3 @@
+#include "res.h"
+
+IDBITMAP_MOON		BITMAP		smiley.bmp

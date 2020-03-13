@@ -3,17 +3,35 @@
 void main (void)
 {
     // declarations
+    void initFunc(void);
     void keyboardFunc(unsigned int);
     void displayFunc(void);
     void reshapeFunc(int, int);
 
     // code
+    gwmInitializeCallback(initFunc);
     gwmKeyboardCallback(keyboardFunc);
     gwmDisplayCallback(displayFunc);
     gwmReshapeCallback(reshapeFunc);
 
     gwmCreateWindow("Perspective Triangle", 100, 100, 800, 600);
     gwmEventLoop();
+}
+
+void initFunc(void)
+{
+    // clear the depth buffer
+	glClearDepth(1.0f);
+
+	// clear the screen by OpenGL
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+	// enable depth
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	glShadeModel(GL_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
 
 void keyboardFunc(unsigned int key)
@@ -31,7 +49,6 @@ void reshapeFunc(int width, int height)
     glLoadIdentity();
 
     glViewport(0, 0, width, height);
-    //glOrtho(-2, 2, -2, 2, -1, 1);
 	gluPerspective(45.0, (float)width / (float)height, 0.1f, 100.0f);
 
 }
@@ -43,9 +60,7 @@ void displayFunc(void)
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
 	glTranslatef(0.0f, 0.0f, -3.0f);
-
 
 	glBegin(GL_TRIANGLES);
 
